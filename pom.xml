@@ -1,0 +1,26 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.sudhi.financetracker</groupId>
+  <artifactId>finance-tracker</artifactId>
+  <version>0.1.0</version>
+  <packaging>pom</packaging>
+
+  <properties>
+    <maven.compiler.source>17</maven.compiler.source>
+    <maven.compiler.target>17</maven.compiler.target>
+    <maven.compiler.release>17</maven.compiler.release>
+</properties>
+
+  <modules>
+    <module>modules/common</module>
+    <module>modules/user-core</module>
+    <module>modules/finance-core</module>
+    <module>modules/budget-engine</module>
+    <module>modules/analytics-engine</module>
+    <module>modules/fire-engine</module>
+    <module>modules/io-service</module>
+    <module>app/finance-app</module>
+  </modules>
+
+</project>
