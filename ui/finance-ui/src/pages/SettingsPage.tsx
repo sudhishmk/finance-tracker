@@ -45,7 +45,7 @@ export default function SettingsPage({
   
 
   return (
-    <div style={{ padding: 20, maxWidth: 600 }}>
+    <div style={{ padding: 20, width: "90%" }}>
       <h2>⚙ Settings</h2>
 
       <h3>Currency</h3>

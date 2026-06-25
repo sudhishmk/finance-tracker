@@ -93,7 +93,7 @@ export default function IncomePage({
   };
 
   return (
-    <div style={{ maxWidth: 800 }}>
+    <div style={{ width: "100%" }}>
       <h2>💰 Income</h2>
 
       {/* Month Selector */}

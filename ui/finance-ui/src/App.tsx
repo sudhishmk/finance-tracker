@@ -148,7 +148,11 @@ function App() {
       {/* MAIN CONTENT */}
       <main
         style={{
-          padding: "24px",
+          width: "100%",
+          maxWidth: "1600px",
+          margin: "0 auto",
+          padding: "24px 32px",
+          boxSizing: "border-box",
         }}
       >
         <Routes>

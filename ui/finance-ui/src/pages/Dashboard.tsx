@@ -104,10 +104,11 @@ export default function Dashboard({
         <>
           <div
             style={{
-              display: "flex",
-              gap: "20px",
-              flexWrap: "wrap",
-              marginBottom: "30px",
+              display: "grid",
+              gridTemplateColumns:
+                "repeat(auto-fit, minmax(220px, 1fr))",
+              gap: 20,
+              marginBottom: 24,
             }}
           >
             <Card
@@ -131,7 +132,13 @@ export default function Dashboard({
             />
           </div>
 
-          <div style={{ display: "flex", gap: "20px", flexWrap: "wrap" }}>
+          <div style={{ 
+              display: "grid",
+              gridTemplateColumns:
+                "repeat(auto-fit, minmax(220px, 1fr))",
+              gap: 20,
+              marginBottom: 24, 
+            }}>
             <Card
               title="High Value Spend"
               value={`${formatCurrency(summary.highValueSpend, preferences.currency)}`}

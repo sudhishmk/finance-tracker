@@ -68,7 +68,7 @@ export default function FirePage({
   ]);
 
   return (
-    <div style={{ maxWidth: 900 }}>
+    <div style={{ width: "100%" }}>
       <h2>🔥 Wealth & FIRE Overview</h2>
 
       {/* Advanced Simulation Button */}

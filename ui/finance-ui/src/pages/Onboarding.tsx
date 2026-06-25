@@ -38,7 +38,7 @@ export default function Onboarding({ onComplete }: { onComplete: () => void }) {
   };
 
   return (
-    <div style={{ padding: 30, maxWidth: 500, margin: "auto" }}>
+    <div style={{ padding: 30, width: "100%", margin: "auto" }}>
       <h2>Step {step} of 4</h2>
 
       {step === 1 && (

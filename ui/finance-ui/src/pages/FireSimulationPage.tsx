@@ -163,7 +163,7 @@ export default function FireSimulationPage({
 
   return (
     
-   <div style={{ maxWidth: 1200 }}>
+   <div style={{ width: "100%" }}>
       <h2>Advanced FIRE Simulation</h2>
 
       <div style={{ marginBottom: 20 }}>

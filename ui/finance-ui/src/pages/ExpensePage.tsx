@@ -127,7 +127,7 @@ export default function ExpensePage({
   };
 
   return (
-    <div style={{ maxWidth: 900 }}>
+    <div style={{ width: "100%" }}>
       <h2>💸 Expenses</h2>
 
       {/* Add Expense Card */}
