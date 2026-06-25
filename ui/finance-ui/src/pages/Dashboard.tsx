@@ -17,10 +17,6 @@ type Summary = {
 
 
 
-function getCurrentMonth() {
-  const now = new Date();
-  return now.toISOString().slice(0, 7);
-}
 
 function getCurrencySymbol(currency: string) {
   switch (currency) {
@@ -62,10 +58,11 @@ function Card({
 
 export default function Dashboard({
   preferences,
+  month,
 }: {
   preferences: Preferences;
+  month: string;
 }) {
-  const [month, setMonth] = useState(getCurrentMonth());
   const [summary, setSummary] = useState<Summary | null>(null);
   const [loading, setLoading] = useState(false);
   const [budgetData, setBudgetData] = useState<any[]>([]);
@@ -100,15 +97,6 @@ export default function Dashboard({
     <div>
       <h2 style={{ marginBottom: "20px" }}>📊 Monthly Dashboard</h2>
 
-      {/* Month Selector */}
-      <div style={{ marginBottom: "20px" }}>
-        <label style={{ marginRight: "10px" }}>Select Month:</label>
-        <input
-          type="month"
-          value={month}
-          onChange={(e) => setMonth(e.target.value)}
-        />
-      </div>
 
       {loading && <div>Loading...</div>}
 

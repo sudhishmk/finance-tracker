@@ -1,0 +1,159 @@
+Epic 1: Polish & User Experience (Current)
+
+Goal: Make the application feel like a polished desktop/web application.
+
+🎨 UI & UX
+Shared design system
+Consistent cards
+Better spacing & typography
+Unified color palette
+Responsive layouts
+📅 Global Month Selector
+Single month selector for entire app
+Previous/Next month navigation
+Dashboard, Income, Expense, FIRE all synchronized
+📊 Better Tables
+Search
+Sorting
+Filters
+Sticky headers
+Pagination (when needed)
+Better empty states
+🔔 User Experience
+Toast notifications
+Delete confirmation dialogs
+Loading skeletons
+Better validation messages
+Success/error feedback
+💰 Currency & Formatting
+Global formatter
+Compact currency support (future)
+Consistent dates
+Percentage formatting
+⭐ Epic 2: Financial Intelligence (AI Coach)
+
+This becomes the signature feature of the application.
+
+Instead of simply showing numbers:
+
+Income : ₹150,000
+Expense: ₹80,000
+
+The app starts answering:
+
+"What does this mean?"
+
+💡 AI Financial Coach Dashboard
+
+A new card on Dashboard:
+
+──────────────────────────────
+🤖 Financial Coach
+
+💚 Excellent savings rate this month.
+
+⚠ Dining expenses increased 18%.
+
+💡 Increase retirement SIP by ₹2,000
+to retire 3 years earlier.
+
+🏆 You've stayed within budget for
+the last 4 months.
+──────────────────────────────
+Spending Insights
+
+Examples:
+
+You spent 27% more on Food compared
+to last month.
+Travel expenses exceeded the
+allocated budget by ₹3,500.
+Entertainment spending has been
+decreasing consistently.
+Budget Insights
+NORMAL category
+84% utilized
+
+Only ₹8,500 remaining.
+Savings Insights
+Savings rate
+
+Current : 42%
+
+Last month : 39%
+
+Trend : ↑ Improving
+FIRE Insights
+Current projection
+
+26 years
+
+If SIP increases by
+
+₹3,000/month
+
+↓
+
+Estimated FIRE
+
+22 years
+Behavioral Insights
+Most expensive weekday
+
+Saturday
+Largest expense category
+
+Food
+Highest discretionary spending
+
+Travel
+Monthly Financial Score
+Financial Health
+
+92 / 100
+
+⭐⭐⭐⭐☆
+
+Based on:
+
+Savings rate
+Budget adherence
+Expense consistency
+Investment allocation
+Emergency fund
+FIRE progress
+Achievement System
+
+Instead of gamification, think of it as milestones:
+
+🏅 First Month Under Budget
+
+🏅 6 Months Positive Cash Flow
+
+🏅 25% Savings Rate
+
+🏅 FIRE 10%
+
+🏅 FIRE 25%
+
+🏅 FIRE 50%
+
+Predictive Alerts
+At current spending
+
+You will exceed your
+Food budget in
+
+5 days.
+Weekly Digest
+This Week
+
+Income
+
+Expenses
+
+Largest Purchase
+
+Budget Status
+
+Coach Recommendation

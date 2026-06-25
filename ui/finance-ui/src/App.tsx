@@ -13,11 +13,17 @@ import FirePage from "./pages/FirePage";
 import FireSimulationPage from "./pages/FireSimulationPage";
 import Onboarding from "./pages/Onboarding";
 import SettingsPage from "./pages/SettingsPage";
+import MonthSelector from "./components/MonthSelector";
 import { FiSettings } from "react-icons/fi";
 
+const getCurrentMonth = () =>
+  new Date().toISOString().slice(0, 7);
+
 function App() {
-  const [preferences, setPreferences] =
-    useState<any>(undefined);
+  const [preferences, setPreferences] = useState<any>(undefined);
+
+  const [selectedMonth, setSelectedMonth] =
+    useState(getCurrentMonth());
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -56,7 +62,13 @@ function App() {
   });
 
   return (
-    <div style={{ fontFamily: "Arial, sans-serif" }}>
+    <div
+      style={{
+        fontFamily: "Arial, sans-serif",
+        background: "#f8fafc",
+        minHeight: "100vh",
+      }}
+    >
       {/* HEADER */}
       <header
         style={{
@@ -68,7 +80,9 @@ function App() {
           alignItems: "center",
         }}
       >
-        <h2 style={{ margin: 0 }}>Finance Tracker</h2>
+        <h2 style={{ margin: 0 }}>
+          💰 Finance Tracker
+        </h2>
 
         <FiSettings
           size={22}
@@ -84,6 +98,7 @@ function App() {
           background: "#f1f5f9",
           display: "flex",
           gap: "12px",
+          borderBottom: "1px solid #e2e8f0",
         }}
       >
         <button
@@ -115,40 +130,75 @@ function App() {
         </button>
       </nav>
 
+      {/* GLOBAL MONTH SELECTOR */}
+      <div
+        style={{
+          padding: "16px 24px",
+          display: "flex",
+          justifyContent: "flex-end",
+          background: "#f8fafc",
+        }}
+      >
+        <MonthSelector
+          month={selectedMonth}
+          onChange={setSelectedMonth}
+        />
+      </div>
+
       {/* MAIN CONTENT */}
-      <main style={{ padding: "24px" }}>
+      <main
+        style={{
+          padding: "24px",
+        }}
+      >
         <Routes>
           <Route
             path="/"
             element={
-              <Dashboard preferences={preferences} />
+              <Dashboard
+                preferences={preferences}
+                month={selectedMonth}
+              />
             }
           />
 
           <Route
             path="/income"
             element={
-              <IncomePage preferences={preferences} />
+              <IncomePage
+                preferences={preferences}
+                month={selectedMonth}
+              />
             }
           />
 
           <Route
             path="/expense"
             element={
-              <ExpensePage preferences={preferences} />
+              <ExpensePage
+                preferences={preferences}
+                month={selectedMonth}
+              />
             }
           />
 
           <Route
             path="/fire"
             element={
-              <FirePage preferences={preferences} />
+              <FirePage
+                preferences={preferences}
+                month={selectedMonth}
+              />
             }
           />
 
           <Route
             path="/fire/simulation"
-            element={<FireSimulationPage preferences={preferences}/>}
+            element={
+              <FireSimulationPage
+                preferences={preferences}
+              />
+            }
           />
 
           <Route

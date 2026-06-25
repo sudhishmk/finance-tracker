@@ -13,9 +13,6 @@ type Expense = {
   valueScore: number;
 };
 
-function getCurrentMonth() {
-  return new Date().toISOString().slice(0, 7);
-}
 
 function getCurrencySymbol(currency: string) {
   switch (currency) {
@@ -43,10 +40,12 @@ const PAYMENT_MODES = ["Cash", "Online", "Credit Card"];
 
 export default function ExpensePage({
   preferences,
+  month,
 }: {
   preferences: Preferences;
+  month: string;
 }) {
-  const [month, setMonth] = useState(getCurrentMonth());
+
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [editingId, setEditingId] = useState<number | null>(null);
 
@@ -130,16 +129,6 @@ export default function ExpensePage({
   return (
     <div style={{ maxWidth: 900 }}>
       <h2>💸 Expenses</h2>
-
-      {/* Month Filter */}
-      <div style={{ marginBottom: 20 }}>
-        <label>Select Month: </label>
-        <input
-          type="month"
-          value={month}
-          onChange={(e) => setMonth(e.target.value)}
-        />
-      </div>
 
       {/* Add Expense Card */}
       <div
@@ -276,7 +265,7 @@ export default function ExpensePage({
                 setExpenses((prev) =>
                   prev.map((ex) =>
                     ex.id === expense.id
-                      ? { ...ex, description: e.target.value }
+                      ? { ...ex, item: e.target.value }
                       : ex
                   )
                 )

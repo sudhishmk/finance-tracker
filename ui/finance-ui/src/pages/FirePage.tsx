@@ -13,9 +13,6 @@ type FireResult = {
   yearlyCorpus: { year: number; corpus: number }[];
 };
 
-function getCurrentMonth() {
-  return new Date().toISOString().slice(0, 7);
-}
 
 function getCurrencySymbol(currency: string) {
   switch (currency) {
@@ -30,11 +27,12 @@ function getCurrencySymbol(currency: string) {
 
 export default function FirePage({
   preferences,
+  month,
 }: {
   preferences: Preferences;
+  month: string;
 }) {
   const navigate = useNavigate();
-  const [month] = useState(getCurrentMonth());
   const [result, setResult] = useState<FireResult | null>(null);
 
   const [currentCorpus, setCurrentCorpus] =
@@ -61,7 +59,13 @@ export default function FirePage({
 
   useEffect(() => {
     loadProjection();
-  }, []);
+  }, [
+    month,
+    currentCorpus,
+    returnRate,
+    inflation,
+    multiplier
+  ]);
 
   return (
     <div style={{ maxWidth: 900 }}>

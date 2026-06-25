@@ -9,9 +9,6 @@ type Income = {
   date: string;
 };
 
-function getCurrentMonth() {
-  return new Date().toISOString().slice(0, 7);
-}
 
 function getCurrencySymbol(currency: string) {
   switch (currency) {
@@ -26,10 +23,11 @@ function getCurrencySymbol(currency: string) {
 
 export default function IncomePage({
   preferences,
+  month,
 }: {
   preferences: Preferences;
+  month: string;
 }) {
-  const [month, setMonth] = useState(getCurrentMonth());
   const [incomes, setIncomes] = useState<Income[]>([]);
   const [form, setForm] = useState({
     source: "",
