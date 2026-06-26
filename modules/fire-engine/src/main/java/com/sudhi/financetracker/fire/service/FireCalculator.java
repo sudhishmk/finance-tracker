@@ -33,6 +33,22 @@ public class FireCalculator {
         double corpus = currentCorpus;
         double requiredCorpus = 0;
         List<Double> trajectory = new ArrayList<>();
+
+        if (currentAnnualExpense <= 0) {
+
+                LOG.info(
+                        "No expense data found. Skipping FIRE calculation."
+                );
+        
+                return new FireResult(
+                        0,
+                        0,
+                        currentCorpus,
+                        -1,
+                        0,
+                        new ArrayList<>()
+                );
+            }
         
         
         while (years < 60) {

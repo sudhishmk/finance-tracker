@@ -9,11 +9,12 @@ import com.sudhi.financetracker.finance.model.UserPreferences;
 import com.sudhi.financetracker.finance.repository.ExpenseRepository;
 import com.sudhi.financetracker.finance.repository.UserPreferencesRepository;
 import org.jboss.logging.Logger;
-
+import com.sudhi.financetracker.fire.model.AnnualExpenseSource;
 
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 
+import java.time.YearMonth;
 import java.util.List;
 
 
@@ -41,7 +42,9 @@ public class FireResource {
             @QueryParam("annualIncome") double annualIncome,
             @QueryParam("returnRate") @DefaultValue("10") double returnRate,
             @QueryParam("inflation") @DefaultValue("6") double inflation,
-            @QueryParam("multiplier") @DefaultValue("25") double multiplier
+            @QueryParam("multiplier") @DefaultValue("25") double multiplier,
+            @QueryParam("expenseSource") @DefaultValue("SELECTED_MONTH") AnnualExpenseSource expenseSource,
+            @QueryParam("manualAnnualExpense") Double manualAnnualExpense
     ) {
 
             UserPreferences prefs = preferencesRepository
@@ -68,15 +71,14 @@ public class FireResource {
         LOG.info("Retirement %: " + retirementPct);
         LOG.info("Annual investment: " + annualInvestment);
             
-        List<Expense> expenses = expenseRepository.findByMonth(month);
-
-        double monthlyExpense = expenses.stream()
-                .mapToDouble(Expense::getAmount)
-                .sum();
-
-        double annualExpense = monthlyExpense * 12;
-        LOG.info("Monthly expense: " + monthlyExpense);
-        LOG.info("Annual expense: " + annualExpense);
+        double annualExpense = calculateAnnualExpense(
+                month,
+                expenseSource,
+                manualAnnualExpense
+        );
+        
+        LOG.info("Expense Source : " + expenseSource);
+        LOG.info("Annual Expense : " + annualExpense);
         
         return fireService.project(
                 annualExpense,
@@ -128,6 +130,73 @@ public class FireResource {
                 FireSimulationRequest request
         ) {
         return fireService.fullSimulation(request);
+        }
+
+        private double calculateAnnualExpense(
+                String month,
+                AnnualExpenseSource expenseSource,
+                Double manualAnnualExpense
+        ) {
+
+        switch (expenseSource) {
+
+                case MANUAL:
+                return manualAnnualExpense == null
+                        ? 0
+                        : manualAnnualExpense;
+
+                case LAST_6_MONTHS: {
+
+                YearMonth current = YearMonth.parse(month);
+
+                double total = 0;
+
+                for (int i = 0; i < 6; i++) {
+
+                        String m = current.minusMonths(i).toString();
+
+                        total += expenseRepository
+                                .findByMonth(m)
+                                .stream()
+                                .mapToDouble(Expense::getAmount)
+                                .sum();
+                }
+
+                return (total / 6.0) * 12;
+                }
+
+                case LAST_12_MONTHS: {
+
+                YearMonth current = YearMonth.parse(month);
+
+                double total = 0;
+
+                for (int i = 0; i < 12; i++) {
+
+                        String m = current.minusMonths(i).toString();
+
+                        total += expenseRepository
+                                .findByMonth(m)
+                                .stream()
+                                .mapToDouble(Expense::getAmount)
+                                .sum();
+                }
+
+                return total;
+                }
+
+                case SELECTED_MONTH:
+                default:
+
+                double monthlyExpense =
+                        expenseRepository
+                                .findByMonth(month)
+                                .stream()
+                                .mapToDouble(Expense::getAmount)
+                                .sum();
+
+                return monthlyExpense * 12;
+        }
         }
 
     
