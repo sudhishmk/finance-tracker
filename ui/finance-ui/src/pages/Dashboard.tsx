@@ -15,6 +15,23 @@ type Summary = {
   topSpendingCategory: string;
 };
 
+type CategoryBudget = {
+  category: string;
+  budget: number;
+  spent: number;
+  remaining: number;
+  utilization: number;
+  status: string;
+};
+
+type BudgetResponse = {
+  totalBudget: number;
+  totalSpent: number;
+  remaining: number;
+  utilization: number;
+  categories: CategoryBudget[];
+};
+
 
 
 
@@ -65,29 +82,29 @@ export default function Dashboard({
 }) {
   const [summary, setSummary] = useState<Summary | null>(null);
   const [loading, setLoading] = useState(false);
-  const [budgetData, setBudgetData] = useState<any[]>([]);
+  const [budgetData, setBudgetData] = useState<BudgetResponse | null>(null);
 
 
   const symbol = getCurrencySymbol(preferences.currency);
 
   const fetchSummary = async (selectedMonth: string) => {
     setLoading(true);
-  
+
     const summaryRes = await fetch(
       `http://localhost:8080/api/v1/summary?month=${selectedMonth}`
     );
     const summaryData = await summaryRes.json();
     setSummary(summaryData);
-  
+
     const budgetRes = await fetch(
       `http://localhost:8080/api/v1/budget/status?month=${selectedMonth}`
     );
-    const budgetData = await budgetRes.json();
-    setBudgetData(budgetData);
-  
+    const budget = await budgetRes.json();
+    setBudgetData(budget);
+
     setLoading(false);
   };
-  
+
 
   useEffect(() => {
     fetchSummary(month);
@@ -114,7 +131,7 @@ export default function Dashboard({
             <Card
               title="Total Income"
               value={`${formatCurrency(summary.totalIncome, preferences.currency)
-              }`}
+                }`}
             />
             <Card
               title="Total Expenses"
@@ -128,17 +145,17 @@ export default function Dashboard({
             <Card
               title="Savings Rate"
               value={`${formatPercent(summary.savingsRate)
-              }`}
+                }`}
             />
           </div>
 
-          <div style={{ 
-              display: "grid",
-              gridTemplateColumns:
-                "repeat(auto-fit, minmax(220px, 1fr))",
-              gap: 20,
-              marginBottom: 24, 
-            }}>
+          <div style={{
+            display: "grid",
+            gridTemplateColumns:
+              "repeat(auto-fit, minmax(220px, 1fr))",
+            gap: 20,
+            marginBottom: 24,
+          }}>
             <Card
               title="High Value Spend"
               value={`${formatCurrency(summary.highValueSpend, preferences.currency)}`}
@@ -157,8 +174,36 @@ export default function Dashboard({
       <div style={{ marginTop: "40px" }}>
         <AllocationChart preferences={preferences} />
       </div>
+      <Card
+        title="Budget"
+        value={formatCurrency(
+          budgetData?.totalBudget ?? 0,
+          preferences.currency
+        )}
+      />
+
+      <Card
+        title="Spent"
+        value={formatCurrency(
+          budgetData?.totalSpent ?? 0,
+          preferences.currency
+        )}
+      />
+
+      <Card
+        title="Remaining"
+        value={formatCurrency(
+          budgetData?.remaining ?? 0,
+          preferences.currency
+        )}
+      />
+
+      <Card
+        title="Utilization"
+        value={`${budgetData?.utilization ?? 0}%`}
+      />
       <div style={{ marginTop: "40px" }}>
-        <BudgetChart    data={budgetData}    currencySymbol={symbol}  />
+        <BudgetChart data={budgetData?.categories ?? []} currencySymbol={symbol} />
       </div>
 
     </div>

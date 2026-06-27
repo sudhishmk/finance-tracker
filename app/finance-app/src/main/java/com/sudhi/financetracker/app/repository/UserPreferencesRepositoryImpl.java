@@ -6,6 +6,11 @@ import com.sudhi.financetracker.finance.model.UserPreferences;
 import com.sudhi.financetracker.finance.repository.UserPreferencesRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.sudhi.financetracker.finance.model.DefaultBudgets;
+import com.sudhi.financetracker.finance.model.MonthlyBudget;
+
+import java.util.HashMap;
 
 import java.util.Map;
 import java.util.Optional;
@@ -30,6 +35,7 @@ public class UserPreferencesRepositoryImpl implements UserPreferencesRepository 
 
         try {
             entity.allocationJson = mapper.writeValueAsString(preferences.allocation());
+            entity.categoryBudgets = mapper.writeValueAsString(preferences.categoryBudgets());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -50,16 +56,56 @@ public class UserPreferencesRepositoryImpl implements UserPreferencesRepository 
         }
 
         try {
-            Map<String, Double> allocation =
-                    mapper.readValue(entity.allocationJson, Map.class);
+            Map<String, Double> allocation =  mapper.readValue(       
+                    entity.allocationJson,
+            
+                    new TypeReference<
+                            Map<String, Double>
+                    >() {}
+            
+            );
+            
+            Map<String, MonthlyBudget> budgets =
+            
+            new HashMap<>();
+            
+            if (      
+            entity.categoryBudgets != null
+                        &&
+                        !entity.categoryBudgets.isBlank()
+                        ) {
+            
+                budgets =
+            
+                        mapper.readValue(
+            
+                                entity.categoryBudgets,
+            
+                                new TypeReference<
+            
+                                        Map<String,MonthlyBudget>
+            
+                                >() {}
+            
+                        );
+            
+            }else{
+                 budgets = DefaultBudgets.defaults();  
+                 entity.categoryBudgets = mapper.writeValueAsString(
+                    budgets
+            );
+        
+            entity.persist();    
+            }
 
             return Optional.of(
                     new UserPreferences(
-                            entity.currency,
-                            entity.monthlyIncome,
-                            allocation,
-                            entity.fireEnabled,
-                            entity.fireTargetCorpus
+                        entity.currency,
+                        entity.monthlyIncome,
+                        allocation,
+                        budgets,
+                        entity.fireEnabled,
+                        entity.fireTargetCorpus
                     )
             );
         } catch (Exception e) {

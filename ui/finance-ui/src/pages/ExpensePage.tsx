@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import type { Preferences } from "../types";
+import type { Preferences, BudgetStatusResponse } from "../types";
 import { formatCurrency } from "../utils/format";
 
 type Expense = {
@@ -36,6 +36,7 @@ const CATEGORIES = [
   "Other",
 ];
 
+
 const PAYMENT_MODES = ["Cash", "Online", "Credit Card"];
 
 export default function ExpensePage({
@@ -47,6 +48,7 @@ export default function ExpensePage({
 }) {
 
   const [expenses, setExpenses] = useState<Expense[]>([]);
+  const [budget, setBudget] = useState<BudgetStatusResponse | null>(null);
   const [editingId, setEditingId] = useState<number | null>(null);
 
   const [form, setForm] = useState({
@@ -59,7 +61,15 @@ export default function ExpensePage({
     valueScore: 5,
   });
 
-  const symbol = getCurrencySymbol(preferences.currency);
+
+  const fetchBudget = async () => {
+    const res = await fetch(
+      `http://localhost:8080/api/v1/budget/status?month=${month}`
+    );
+    const data =
+      await res.json();
+    setBudget(data);
+  };
 
   const fetchExpenses = async () => {
     const res = await fetch(
@@ -71,6 +81,7 @@ export default function ExpensePage({
 
   useEffect(() => {
     fetchExpenses();
+    fetchBudget();
   }, [month]);
 
   const addExpense = async () => {
@@ -98,7 +109,8 @@ export default function ExpensePage({
       valueScore: 5,
     });
 
-    fetchExpenses();
+    await fetchExpenses();
+    await fetchBudget();
   };
 
   const updateExpense = async (id: number) => {
@@ -115,7 +127,8 @@ export default function ExpensePage({
     );
 
     setEditingId(null);
-    fetchExpenses();
+    await fetchExpenses();
+    await fetchBudget();
   };
 
   const deleteExpense = async (id: number) => {
@@ -123,12 +136,163 @@ export default function ExpensePage({
       `http://localhost:8080/api/v1/expenses/${id}`,
       { method: "DELETE" }
     );
-    fetchExpenses();
+    await fetchExpenses();
+    await fetchBudget();
+  };
+
+  const cardStyle = {
+    padding: 16,
+    borderRadius: 12,
+    background: "#fff",
+    boxShadow:
+      "0 4px 12px rgba(0,0,0,0.05)"
+  };
+
+  const getBudgetColor = (status: string) => {
+    switch (status) {
+      case "OVER":
+        return "#dc2626";
+      case "WARNING":
+        return "#f59e0b";
+      default:
+        return "#16a34a";
+    }
   };
 
   return (
     <div style={{ width: "100%" }}>
       <h2>💸 Expenses</h2>
+      {budget && (
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns:
+              "repeat(auto-fit,minmax(220px,1fr))",
+            gap: 16,
+            marginBottom: 24
+          }}
+        >
+          <div style={cardStyle}>
+            <h4>Budget</h4>
+            <p>
+              {formatCurrency(
+                budget.totalBudget,
+                preferences.currency
+              )}
+            </p>
+          </div>
+          <div style={cardStyle}>
+            <h4>Spent</h4>
+            <p>
+              {formatCurrency(
+                budget.totalSpent,
+                preferences.currency
+              )}
+            </p>
+          </div>
+          <div style={cardStyle}>
+            <h4>Remaining</h4>
+            <p>
+              {formatCurrency(
+                budget.remaining,
+                preferences.currency
+              )}
+            </p>
+          </div>
+          <div style={cardStyle}>
+            <h4>Utilization</h4>
+            <p>
+              {budget.utilization.toFixed(1)}%
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* BUdget SUmmary */}
+
+      {budget?.categories?.map(c => (
+        <div key={c.category}>
+          <div style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 8
+          }}>
+
+            <strong>{c.category}</strong>
+
+            <span style={{
+              background:
+                c.status === "OVER"
+                  ? "#fee2e2"
+                  : c.status === "WARNING"
+                    ? "#fef3c7"
+                    : "#dcfce7",
+
+              color:
+                c.status === "OVER"
+                  ? "#dc2626"
+                  : c.status === "WARNING"
+                    ? "#d97706"
+                    : "#16a34a",
+
+              padding: "2px 8px",
+              borderRadius: 12,
+              fontSize: 11,
+              fontWeight: 600
+            }}>
+              {c.status}
+            </span>
+
+          </div>
+          <div>
+            {formatCurrency(c.spent, preferences.currency)}
+            /
+            {formatCurrency(c.budget, preferences.currency)}
+          </div>
+          <div style={{
+            marginTop: 6,
+            height: 8,
+            background: "#e5e7eb",
+            borderRadius: 8,
+            overflow: "hidden"
+          }}>
+
+            <div style={{
+              width: `${Math.min(c.utilization, 100)}%`,
+              height: "100%",
+              background:
+                c.status === "OVER"
+                  ? "#dc2626"
+                  : c.status === "WARNING"
+                    ? "#f59e0b"
+                    : "#16a34a",
+              transition: "width 0.3s ease"
+            }} />
+
+          </div>
+
+          <div style={{
+            marginTop: 4,
+            display: "flex",
+            justifyContent: "space-between",
+            fontSize: 12,
+            color: "#64748b"
+          }}>
+
+            <span>
+              Remaining {formatCurrency(c.remaining, preferences.currency)}
+            </span>
+
+            <span>
+              {c.utilization.toFixed(1)}%
+            </span>
+
+          </div>
+
+
+
+        </div>
+      ))}
 
       {/* Add Expense Card */}
       <div
@@ -245,119 +409,119 @@ export default function ExpensePage({
         >
           {editingId === expense.id ? (
             <>
-            <input
-              type="date"
-              value={expense.date}
-              onChange={(e) =>
-                setExpenses((prev) =>
-                  prev.map((ex) =>
-                    ex.id === expense.id
-                      ? { ...ex, date: e.target.value }
-                      : ex
-                  )
-                )
-              }
-            />
-
-            <input
-              value={expense.item}
-              onChange={(e) =>
-                setExpenses((prev) =>
-                  prev.map((ex) =>
-                    ex.id === expense.id
-                      ? { ...ex, item: e.target.value }
-                      : ex
-                  )
-                )
-              }
-            />
-
-            <input
-              type="number"
-              value={expense.amount}
-              onChange={(e) =>
-                setExpenses((prev) =>
-                  prev.map((ex) =>
-                    ex.id === expense.id
-                      ? { ...ex, amount: Number(e.target.value) }
-                      : ex
-                  )
-                )
-              }
-            />
-
-            <select
-              value={expense.category}
-              onChange={(e) =>
-                setExpenses((prev) =>
-                  prev.map((ex) =>
-                    ex.id === expense.id
-                      ? { ...ex, category: e.target.value }
-                      : ex
-                  )
-                )
-              }
-            >
-              {CATEGORIES.map((cat) => (
-                <option key={cat}>{cat}</option>
-              ))}
-            </select>
-
-            <select
-              value={expense.account}
-              onChange={(e) =>
-                setExpenses((prev) =>
-                  prev.map((ex) =>
-                    ex.id === expense.id
-                      ? { ...ex, account: e.target.value }
-                      : ex
-                  )
-                )
-              }
-            >
-              {Object.keys(preferences.allocation).map((acc) => (
-                <option key={acc}>{acc}</option>
-              ))}
-            </select>
-
-            <select
-              value={expense.paymentMode}
-              onChange={(e) =>
-                setExpenses((prev) =>
-                  prev.map((ex) =>
-                    ex.id === expense.id
-                      ? { ...ex, paymentMode: e.target.value }
-                      : ex
-                  )
-                )
-              }
-            >
-              {PAYMENT_MODES.map((mode) => (
-                <option key={mode}>{mode}</option>
-              ))}
-            </select>
-
-            <div>
-              Value: {expense.valueScore}
               <input
-                type="range"
-                min="0"
-                max="10"
-                value={expense.valueScore}
+                type="date"
+                value={expense.date}
                 onChange={(e) =>
                   setExpenses((prev) =>
                     prev.map((ex) =>
                       ex.id === expense.id
-                        ? {
-                            ...ex,
-                            valueScore: Number(e.target.value),
-                          }
+                        ? { ...ex, date: e.target.value }
                         : ex
                     )
                   )
                 }
               />
-            </div>
+
+              <input
+                value={expense.item}
+                onChange={(e) =>
+                  setExpenses((prev) =>
+                    prev.map((ex) =>
+                      ex.id === expense.id
+                        ? { ...ex, item: e.target.value }
+                        : ex
+                    )
+                  )
+                }
+              />
+
+              <input
+                type="number"
+                value={expense.amount}
+                onChange={(e) =>
+                  setExpenses((prev) =>
+                    prev.map((ex) =>
+                      ex.id === expense.id
+                        ? { ...ex, amount: Number(e.target.value) }
+                        : ex
+                    )
+                  )
+                }
+              />
+
+              <select
+                value={expense.category}
+                onChange={(e) =>
+                  setExpenses((prev) =>
+                    prev.map((ex) =>
+                      ex.id === expense.id
+                        ? { ...ex, category: e.target.value }
+                        : ex
+                    )
+                  )
+                }
+              >
+                {CATEGORIES.map((cat) => (
+                  <option key={cat}>{cat}</option>
+                ))}
+              </select>
+
+              <select
+                value={expense.account}
+                onChange={(e) =>
+                  setExpenses((prev) =>
+                    prev.map((ex) =>
+                      ex.id === expense.id
+                        ? { ...ex, account: e.target.value }
+                        : ex
+                    )
+                  )
+                }
+              >
+                {Object.keys(preferences.allocation).map((acc) => (
+                  <option key={acc}>{acc}</option>
+                ))}
+              </select>
+
+              <select
+                value={expense.paymentMode}
+                onChange={(e) =>
+                  setExpenses((prev) =>
+                    prev.map((ex) =>
+                      ex.id === expense.id
+                        ? { ...ex, paymentMode: e.target.value }
+                        : ex
+                    )
+                  )
+                }
+              >
+                {PAYMENT_MODES.map((mode) => (
+                  <option key={mode}>{mode}</option>
+                ))}
+              </select>
+
+              <div>
+                Value: {expense.valueScore}
+                <input
+                  type="range"
+                  min="0"
+                  max="10"
+                  value={expense.valueScore}
+                  onChange={(e) =>
+                    setExpenses((prev) =>
+                      prev.map((ex) =>
+                        ex.id === expense.id
+                          ? {
+                            ...ex,
+                            valueScore: Number(e.target.value),
+                          }
+                          : ex
+                      )
+                    )
+                  }
+                />
+              </div>
 
               <button
                 onClick={() =>

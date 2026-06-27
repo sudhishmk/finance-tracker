@@ -16,6 +16,9 @@ public class UserPreferencesEntity extends PanacheEntity {
     @Column(length = 2000)
     public String allocationJson;
 
+    @Column(length = 4000)
+    public String categoryBudgets;
+
     public boolean fireEnabled;
 
     public Double fireTargetCorpus;
