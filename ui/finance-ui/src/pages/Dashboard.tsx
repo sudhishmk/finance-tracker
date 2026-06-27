@@ -4,6 +4,11 @@ import BudgetChart from "../components/BudgetChart";
 import type { Preferences } from "../types";
 import { formatCurrency, formatPercent } from "../utils/format";
 
+import AICoachCard from "../components/AICoachCard";
+
+import { getCoachReview } from "../api/financeApi";
+
+import type { CoachResponse } from "../types";
 
 type Summary = {
   totalIncome: number;
@@ -84,6 +89,8 @@ export default function Dashboard({
   const [loading, setLoading] = useState(false);
   const [budgetData, setBudgetData] = useState<BudgetResponse | null>(null);
 
+  const [coach, setCoach] = useState<CoachResponse | null>(null);
+  const [loadingCoach, setLoadingCoach] = useState(false);
 
   const symbol = getCurrencySymbol(preferences.currency);
 
@@ -105,10 +112,25 @@ export default function Dashboard({
     setLoading(false);
   };
 
+  const fetchCoach = async (selectedMonth: string) => {
+    try {
+      setLoadingCoach(true);
+      const response = await getCoachReview(selectedMonth);
+      setCoach(response);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoadingCoach(false);
+    }
+  };
+
 
   useEffect(() => {
     fetchSummary(month);
+    fetchCoach(month);
   }, [month]);
+
+
 
   return (
     <div>
@@ -174,38 +196,52 @@ export default function Dashboard({
       <div style={{ marginTop: "40px" }}>
         <AllocationChart preferences={preferences} />
       </div>
-      <Card
-        title="Budget"
-        value={formatCurrency(
-          budgetData?.totalBudget ?? 0,
-          preferences.currency
-        )}
-      />
 
-      <Card
-        title="Spent"
-        value={formatCurrency(
-          budgetData?.totalSpent ?? 0,
-          preferences.currency
-        )}
-      />
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))",
+          gap: 20, marginTop: 24, marginBottom: 24
+        }}
+      >
 
-      <Card
-        title="Remaining"
-        value={formatCurrency(
-          budgetData?.remaining ?? 0,
-          preferences.currency
-        )}
-      />
+        <Card
+          title="Budget"
+          value={formatCurrency(
+            budgetData?.totalBudget ?? 0,
+            preferences.currency
+          )}
+        />
 
-      <Card
-        title="Utilization"
-        value={`${budgetData?.utilization ?? 0}%`}
-      />
-      <div style={{ marginTop: "40px" }}>
-        <BudgetChart data={budgetData?.categories ?? []} currencySymbol={symbol} />
+        <Card
+          title="Spent"
+          value={formatCurrency(
+            budgetData?.totalSpent ?? 0,
+            preferences.currency
+          )}
+        />
+
+        <Card
+          title="Remaining"
+          value={formatCurrency(
+            budgetData?.remaining ?? 0,
+            preferences.currency
+          )}
+        />
+
+        <Card
+          title="Utilization"
+          value={`${budgetData?.utilization ?? 0}%`}
+        />
       </div>
+        <div style={{ marginTop: "40px" }}>
+          <BudgetChart data={budgetData?.categories ?? []} currencySymbol={symbol} />
+        </div>
 
-    </div>
-  );
+        <div style={{ marginTop: "40px" }} >
+          {loadingCoach ?
+            <div> Generating AI Insights...</div>
+            : coach && <AICoachCard coach={coach} />
+
+          }
+        </div>
+      </div>
+      );
 }

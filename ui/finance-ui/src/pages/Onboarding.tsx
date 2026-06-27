@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 const defaultAllocation = {
-  NORMAL: 50,
+  NORMAL_EXPENSE: 50,
   RETIREMENT: 15,
   LONG_TERM_SAVINGS: 15,
   PERSONAL_GROWTH: 10,

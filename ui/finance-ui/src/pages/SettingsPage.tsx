@@ -15,6 +15,15 @@ export default function SettingsPage({
     0
   );
 
+  const formatLabel = (value: string) =>
+    value
+      .toLowerCase()
+      .split("_")
+      .map(
+        word => word.charAt(0).toUpperCase() + word.slice(1)
+      )
+      .join(" ");
+
   const totalBudgetAllocation = Object.values(form.categoryBudgets ?? {})
     .filter(b => b.enabled)
     .reduce((sum, b) => sum + b.percentage, 0);
@@ -103,17 +112,18 @@ export default function SettingsPage({
         <h3 style={{ marginTop: 20 }}>Allocation (%)</h3>
 
         {Object.entries(form.allocation).map(([key, value]) => (
-          <div key={key} style={{ marginBottom: 10 }}>
-            <label>{key}</label>
-            <input
-              type="number"
-              value={value}
-              onChange={(e) =>
-                updateAllocation(key, Number(e.target.value))
-              }
-            />
+          <div key={key} style={{ display: "grid", gridTemplateColumns: "220px 120px", gap: 12, alignItems: "center", marginBottom: 10 }}>
+            <label> {formatLabel(key)} </label>
+
+            <input   style={{ width: "90px"}} type="number" value={value} onChange={(e) => updateAllocation(key, Number(e.target.value))} />
+
           </div>
+
         ))}
+
+
+
+
       </div>
       <div
         style={{

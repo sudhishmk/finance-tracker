@@ -21,4 +21,8 @@ public class FireSimulationRequest {
     public double taxRate;              // %
 
     public Double annualExpense;
+
+    public AnnualExpenseSource expenseSource;
+    
+    public Double manualAnnualExpense;
 }

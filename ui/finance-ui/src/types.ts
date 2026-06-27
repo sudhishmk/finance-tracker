@@ -28,3 +28,10 @@ export type BudgetStatusResponse = {
   utilization: number;
   categories: CategoryBudget[];
 };
+
+export interface CoachResponse {
+  wins: string[];
+  risks: string[];
+  opportunities: string[];
+  actions: string[];
+}
