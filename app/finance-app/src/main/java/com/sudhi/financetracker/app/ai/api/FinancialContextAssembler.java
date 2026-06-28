@@ -17,107 +17,74 @@ import com.sudhi.financetracker.finance.model.Expense;
 import com.sudhi.financetracker.finance.model.Income;
 import com.sudhi.financetracker.finance.model.MonthlySummary;
 import com.sudhi.financetracker.finance.model.UserPreferences;
-
+import com.sudhi.financetracker.finance.service.IncomeService;
 import com.sudhi.financetracker.finance.service.SummaryService;
 
 @ApplicationScoped
 public class FinancialContextAssembler {
 
-    @Inject
-    ExpenseRepositoryImpl expenseRepository;
+        @Inject
+        ExpenseRepositoryImpl expenseRepository;
 
-    @Inject
-    IncomeRepositoryImpl incomeRepository;
+        @Inject
+        IncomeRepositoryImpl incomeRepository;
 
-    @Inject
-    UserPreferencesRepositoryImpl preferencesRepository;
+        @Inject
+        UserPreferencesRepositoryImpl preferencesRepository;
 
-    SummaryService summaryService =
+        SummaryService summaryService = new SummaryService();
 
-            new SummaryService();
+        BudgetService budgetService = new BudgetService();
 
-    BudgetService budgetService =
+        IncomeService incomeService = new IncomeService();
 
-            new BudgetService();
+        public FinancialSnapshot build(String month) {
 
-    public FinancialSnapshot build(
+                List<Income> incomes = incomeRepository.findByMonth(month);
 
-            String month
+                List<Expense> expenses = expenseRepository.findByMonth( month );
 
-    ) {
+                UserPreferences preferences =
 
-        List<Income> incomes =
+                                preferencesRepository
 
-                incomeRepository.findByMonth(
+                                                .get()
 
-                        month
+                                                .orElseThrow(
 
-                );
+                                                                () -> new RuntimeException(
 
-        List<Expense> expenses =
+                                                                                "User preferences not found"
 
-                expenseRepository.findByMonth(
+                                                                )
 
-                        month
+                                                );
 
-                );
+                MonthlySummary summary = summaryService.generate(incomes,expenses);
+                double monthlyIncome = incomeService.totalMonthlyIncome(incomes);
 
-        UserPreferences preferences =
+                var budget = budgetService.calculate(preferences, expenses, monthlyIncome);
 
-                preferencesRepository
+                return new FinancialSnapshot(
 
-                        .get()
+                                summary.totalIncome(),
 
-                        .orElseThrow(
+                                summary.totalExpenses(),
 
-                                () -> new RuntimeException(
+                                summary.savings(),
 
-                                        "User preferences not found"
+                                summary.savingsRate(),
 
-                                )
+                                summary.topSpendingCategory(),
 
-                        );
+                                budget.utilization(),
 
-        MonthlySummary summary =
+                                preferences.fireTargetCorpus(),
 
-                summaryService.generate(
-
-                        incomes,
-
-                        expenses
+                                List.of()
 
                 );
 
-        var budget =
-
-                budgetService.calculate(
-
-                        preferences,
-
-                        expenses
-
-                );
-
-        return new FinancialSnapshot(
-
-                summary.totalIncome(),
-
-                summary.totalExpenses(),
-
-                summary.savings(),
-
-                summary.savingsRate(),
-
-                summary.topSpendingCategory(),
-
-                budget.utilization(),
-
-                preferences.fireTargetCorpus(),
-
-                List.of()
-
-        );
-
-    }
+        }
 
 }

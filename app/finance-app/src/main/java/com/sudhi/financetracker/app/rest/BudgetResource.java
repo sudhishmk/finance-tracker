@@ -5,9 +5,12 @@ import java.util.List;
 import com.sudhi.financetracker.app.service.BudgetService;
 import com.sudhi.financetracker.budget.model.BudgetStatusResponse;
 import com.sudhi.financetracker.finance.model.Expense;
+import com.sudhi.financetracker.finance.model.Income;
 import com.sudhi.financetracker.finance.model.UserPreferences;
 import com.sudhi.financetracker.finance.repository.ExpenseRepository;
+import com.sudhi.financetracker.finance.repository.IncomeRepository;
 import com.sudhi.financetracker.finance.repository.UserPreferencesRepository;
+import com.sudhi.financetracker.finance.service.IncomeService;
 
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
@@ -20,55 +23,34 @@ public class BudgetResource {
 
     private final UserPreferencesRepository preferencesRepository;
 
+    private final IncomeRepository incomeRepository;
+
+    private final IncomeService incomeService =  new IncomeService();
+
     private final BudgetService budgetService = new BudgetService();
 
-    public BudgetResource(
-
-            ExpenseRepository expenseRepository,
-
-            UserPreferencesRepository preferencesRepository
-
-    ) {
+    public BudgetResource(ExpenseRepository expenseRepository,UserPreferencesRepository preferencesRepository,
+        IncomeRepository incomeRepository) {
 
         this.expenseRepository = expenseRepository;
-
         this.preferencesRepository = preferencesRepository;
+        this.incomeRepository =     incomeRepository;
 
     }
 
     @GET
     @Path("/status")
-    public BudgetStatusResponse status(
+    public BudgetStatusResponse status( @QueryParam("month") String month ) {
 
-            @QueryParam("month")
+        UserPreferences preferences = preferencesRepository.get().orElseThrow();
 
-            String month
+        List<Expense> expenses = expenseRepository.findByMonth( month);
 
-    ) {
+        List<Income> incomes = incomeRepository.findByMonth(month);
 
-        UserPreferences preferences =
+        double monthlyIncome = incomeService.totalMonthlyIncome(incomes);
 
-                preferencesRepository
-
-                        .get()
-
-                        .orElseThrow();
-
-        List<Expense> expenses =
-
-                expenseRepository.findByMonth(
-
-                        month
-
-                );
-
-        return budgetService.calculate(
-
-                preferences,
-
-                expenses
-
-        );
+        return budgetService.calculate(preferences,expenses,monthlyIncome);
 
     }
 

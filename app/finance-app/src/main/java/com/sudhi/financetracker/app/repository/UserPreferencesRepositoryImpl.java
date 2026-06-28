@@ -56,58 +56,40 @@ public class UserPreferencesRepositoryImpl implements UserPreferencesRepository 
         }
 
         try {
-            Map<String, Double> allocation =  mapper.readValue(       
+            Map<String, Double> allocation = mapper.readValue(
                     entity.allocationJson,
-            
-                    new TypeReference<
-                            Map<String, Double>
-                    >() {}
-            
+
+                    new TypeReference<Map<String, Double>>() {
+                    }
+
             );
-            
+
             Map<String, MonthlyBudget> budgets =
-            
-            new HashMap<>();
-            
-            if (      
-            entity.categoryBudgets != null
-                        &&
-                        !entity.categoryBudgets.isBlank()
-                        ) {
-            
-                budgets =
-            
-                        mapper.readValue(
-            
-                                entity.categoryBudgets,
-            
-                                new TypeReference<
-            
-                                        Map<String,MonthlyBudget>
-            
-                                >() {}
-            
-                        );
-            
-            }else{
-                 budgets = DefaultBudgets.defaults();  
-                 entity.categoryBudgets = mapper.writeValueAsString(
-                    budgets
-            );
-        
-            entity.persist();    
+
+                    new HashMap<>();
+
+            if (entity.categoryBudgets != null
+                    &&
+                    !entity.categoryBudgets.isBlank()) {
+
+                budgets = mapper.readValue(entity.categoryBudgets, new TypeReference<Map<String, MonthlyBudget>>() {
+                });
+
+            } else {
+                budgets = DefaultBudgets.defaults();
+                entity.categoryBudgets = mapper.writeValueAsString(budgets);
+
+                entity.persist();
             }
 
             return Optional.of(
                     new UserPreferences(
-                        entity.currency,
-                        entity.monthlyIncome,
-                        allocation,
-                        budgets,
-                        entity.fireEnabled,
-                        entity.fireTargetCorpus
-                    )
-            );
+                            entity.currency,
+                            entity.monthlyIncome,
+                            allocation,
+                            budgets,
+                            entity.fireEnabled,
+                            entity.fireTargetCorpus));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

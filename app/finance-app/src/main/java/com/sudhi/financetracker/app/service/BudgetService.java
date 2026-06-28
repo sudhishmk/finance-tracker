@@ -15,11 +15,8 @@ public class BudgetService {
 
     private final BudgetCalculator calculator = new BudgetCalculator();
 
-    public BudgetStatusResponse calculate(
-            UserPreferences preferences,
-            List<Expense> expenses) {
+    public BudgetStatusResponse calculate( UserPreferences preferences, List<Expense> expenses, double monthlyIncome) {
 
-        double monthlyIncome = preferences.monthlyIncome();
 
         double normalPct = preferences.allocation()
                 .getOrDefault(

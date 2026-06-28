@@ -89,18 +89,6 @@ export default function SettingsPage({
         <option value="EUR">EUR €</option>
       </select>
 
-      <h3 style={{ marginTop: 20 }}>Monthly Income</h3>
-      <input
-        type="number"
-        value={form.monthlyIncome}
-        onChange={(e) =>
-          setForm({
-            ...form,
-            monthlyIncome: Number(e.target.value),
-          })
-        }
-      />
-
       <div style={{
         padding: 20,
         background: "#fff",

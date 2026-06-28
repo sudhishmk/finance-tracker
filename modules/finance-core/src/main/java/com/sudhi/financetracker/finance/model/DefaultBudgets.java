@@ -14,22 +14,21 @@ public class DefaultBudgets {
             new MonthlyBudget(30, true),
 
             "Travel",
-            new MonthlyBudget(10, true),
+            new MonthlyBudget(15, true),
 
             "Utilities",
-            new MonthlyBudget(10, true),
+            new MonthlyBudget(15, true),
 
             "Health",
             new MonthlyBudget(10, true),
 
-            "Fun",
+            "Shopping",
             new MonthlyBudget(15, true),
 
-            "Personal Growth",
-            new MonthlyBudget(15, true),
+            "Housing",
+            new MonthlyBudget(15, true)
 
-            "Contribution",
-            new MonthlyBudget(10, true)
+
 
         );
 

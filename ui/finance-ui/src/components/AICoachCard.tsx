@@ -168,25 +168,12 @@ export default function AICoachCard(
 
             </div>
 
-            <p
-
-                style={{
-
-                    color: "#6b7280",
-
-                    marginBottom: "24px"
-
-                }}
-
-            >
-
+            <p style={{color: "#6b7280", marginBottom: "24px"}}>
                 Personalized recommendations generated from your financial data.
-
             </p>
             <p style={{color: "#CE2029", marginBottom: "24px" }}>
 <b>DISCLAIMER</b> : This content was generated with assistance from AI. AI-generated content may contain errors or inaccuracies. Always verify critical information.
 This information provided for general informational purposes only. It is not a substitute for professional [legal/medical/financial] advice, and we are not responsible for any actions taken based on these outputs
-
             </p>
 
             <Section
