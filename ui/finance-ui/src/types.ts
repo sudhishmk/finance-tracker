@@ -4,24 +4,20 @@ export type MonthlyBudget = {
 };
 
 export interface Preferences {
+  currency: string;
 
-    currency: string;
+  monthlyIncome: number;
 
-    monthlyIncome: number;
+  allocation: Record<string, number>;
 
-    allocation: Record<string, number>;
+  categoryBudgets: Record<string, MonthlyBudget>;
 
-    categoryBudgets: Record<string, MonthlyBudget>;
+  plan: FinancialPlan;
 
-    plan: FinancialPlan;
+  fireEnabled: boolean;
 
-    fireEnabled: boolean;
-
-    fireTargetCorpus?: number;
-
+  fireTargetCorpus?: number;
 }
-
-
 
 export type CategoryBudget = {
   category: string;
@@ -48,40 +44,75 @@ export interface CoachResponse {
 }
 
 export interface Allocation {
+  id: string;
 
-    id: string;
+  name: string;
 
-    name: string;
+  percentage: number;
 
-    percentage: number;
+  type: "SPENDING" | "INVESTMENT";
 
-    type: "SPENDING" | "INVESTMENT";
-
-    enabled: boolean;
-
+  enabled: boolean;
 }
 
 export interface BudgetCategory {
+  id: string;
 
-    id: string;
+  name: string;
 
-    name: string;
+  allocationId: string;
 
-    allocationId: string;
+  percentage: number;
 
-    percentage: number;
-
-    enabled: boolean;
-
+  enabled: boolean;
 }
 
 export interface FinancialPlan {
+  version: number;
 
-    version: number;
+  allocations: Allocation[];
 
-    allocations: Allocation[];
-
-    categories: BudgetCategory[];
-
+  categories: BudgetCategory[];
 }
 
+export interface AllocationSnapshot {
+  id: string;
+
+  name: string;
+
+  budget: number;
+
+  spent: number;
+
+  remaining: number;
+
+  utilization: number;
+}
+
+export interface CategorySnapshot {
+  id: string;
+
+  name: string;
+
+  allocationId: string;
+
+  budget: number;
+
+  spent: number;
+
+  remaining: number;
+
+  utilization: number;
+}
+
+export interface BudgetSnapshot {
+  income: number;
+
+  spendingPool: number;
+
+  investmentPool: number;
+
+  allocations: AllocationSnapshot[];
+
+  categories: CategorySnapshot[];
+}

@@ -1,44 +1,32 @@
 import {
+  ResponsiveContainer,
   BarChart,
-  Bar,
   XAxis,
   YAxis,
   Tooltip,
   Legend,
-  ResponsiveContainer,
+  Bar,
 } from "recharts";
 
-type BudgetItem = {
-  category: string;
-  budget: number;
-  spent: number;
-  remaining: number;
-  utilization: number;
-  status: string;
-};
+import type { CategorySnapshot } from "../types";
 
 export default function BudgetChart({
   data,
+
   currencySymbol,
 }: {
-  data: BudgetItem[];
+  data: CategorySnapshot[];
+
   currencySymbol: string;
 }) {
-
-  const chartData =
-    Array.isArray(data)
-      ? data
-      : [];
-
-  if (chartData.length === 0) {
+  if (data.length === 0) {
     return (
       <div
         style={{
           padding: 20,
           borderRadius: 12,
           background: "#fff",
-          boxShadow:
-            "0 4px 12px rgba(0,0,0,0.05)"
+          boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
         }}
       >
         <h3>Budget vs Actual</h3>
@@ -47,42 +35,36 @@ export default function BudgetChart({
           style={{
             padding: 24,
             textAlign: "center",
-            color: "#64748b"
+            color: "#64748b",
           }}
         >
           No budget data available
         </div>
-
       </div>
     );
   }
+
+  const chartData = data.map((category) => ({
+    category: category.name,
+
+    budget: category.budget,
+
+    spent: category.spent,
+  }));
 
   return (
     <div
       style={{
         width: "100%",
-        height: 400
+
+        height: 400,
       }}
     >
+      <h3>Budget vs Actual</h3>
 
-      <h3
-        style={{
-          marginBottom: 16
-        }}
-      >
-        Budget vs Actual
-      </h3>
-
-      <ResponsiveContainer
-        width="100%"
-        height="100%"
-      >
-
+      <ResponsiveContainer width="100%" height="100%">
         <BarChart data={chartData}>
-
-          <XAxis
-            dataKey="category"
-          />
+          <XAxis dataKey="category" />
 
           <YAxis />
 
@@ -94,22 +76,11 @@ export default function BudgetChart({
 
           <Legend />
 
-          <Bar
-            dataKey="budget"
-            fill="#3b82f6"
-            name="Budget"
-          />
+          <Bar dataKey="budget" fill="#3b82f6" name="Budget" />
 
-          <Bar
-            dataKey="spent"
-            fill="#ef4444"
-            name="Spent"
-          />
-
+          <Bar dataKey="spent" fill="#ef4444" name="Spent" />
         </BarChart>
-
       </ResponsiveContainer>
-
     </div>
   );
 }
