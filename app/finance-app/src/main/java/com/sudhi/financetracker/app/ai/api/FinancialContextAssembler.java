@@ -42,45 +42,24 @@ public class FinancialContextAssembler {
 
                 List<Income> incomes = incomeRepository.findByMonth(month);
 
-                List<Expense> expenses = expenseRepository.findByMonth( month );
+                List<Expense> expenses = expenseRepository.findByMonth(month);
 
-                UserPreferences preferences =
+                UserPreferences preferences = preferencesRepository.get()
+                                .orElseThrow(() -> new RuntimeException("User preferences not found"));
 
-                                preferencesRepository
-
-                                                .get()
-
-                                                .orElseThrow(
-
-                                                                () -> new RuntimeException(
-
-                                                                                "User preferences not found"
-
-                                                                )
-
-                                                );
-
-                MonthlySummary summary = summaryService.generate(incomes,expenses);
+                MonthlySummary summary = summaryService.generate(incomes, expenses);
                 double monthlyIncome = incomeService.totalMonthlyIncome(incomes);
 
                 var budget = budgetService.calculate(preferences, expenses, monthlyIncome);
 
                 return new FinancialSnapshot(
-
                                 summary.totalIncome(),
-
                                 summary.totalExpenses(),
-
                                 summary.savings(),
-
                                 summary.savingsRate(),
-
                                 summary.topSpendingCategory(),
-
                                 budget.utilization(),
-
                                 preferences.fireTargetCorpus(),
-
                                 List.of()
 
                 );
