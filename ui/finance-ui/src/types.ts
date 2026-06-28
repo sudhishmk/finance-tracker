@@ -3,14 +3,25 @@ export type MonthlyBudget = {
   enabled: boolean;
 };
 
-export type Preferences = {
-  currency: string;
-  monthlyIncome: number;
-  allocation: Record<string, number>;
-  categoryBudgets: Record<string, MonthlyBudget>;
-  fireEnabled: boolean;
-  fireTargetCorpus?: number;
-};
+export interface Preferences {
+
+    currency: string;
+
+    monthlyIncome: number;
+
+    allocation: Record<string, number>;
+
+    categoryBudgets: Record<string, MonthlyBudget>;
+
+    plan: FinancialPlan;
+
+    fireEnabled: boolean;
+
+    fireTargetCorpus?: number;
+
+}
+
+
 
 export type CategoryBudget = {
   category: string;
@@ -35,3 +46,42 @@ export interface CoachResponse {
   opportunities: string[];
   actions: string[];
 }
+
+export interface Allocation {
+
+    id: string;
+
+    name: string;
+
+    percentage: number;
+
+    type: "SPENDING" | "INVESTMENT";
+
+    enabled: boolean;
+
+}
+
+export interface BudgetCategory {
+
+    id: string;
+
+    name: string;
+
+    allocationId: string;
+
+    percentage: number;
+
+    enabled: boolean;
+
+}
+
+export interface FinancialPlan {
+
+    version: number;
+
+    allocations: Allocation[];
+
+    categories: BudgetCategory[];
+
+}
+

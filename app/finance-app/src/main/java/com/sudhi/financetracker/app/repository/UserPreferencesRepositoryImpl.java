@@ -7,6 +7,8 @@ import com.sudhi.financetracker.finance.repository.UserPreferencesRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.sudhi.financetracker.finance.domain.plan.FinancialPlan;
+import com.sudhi.financetracker.finance.domain.plan.PlanAdapter;
 import com.sudhi.financetracker.finance.model.DefaultBudgets;
 import com.sudhi.financetracker.finance.model.MonthlyBudget;
 
@@ -36,6 +38,7 @@ public class UserPreferencesRepositoryImpl implements UserPreferencesRepository 
         try {
             entity.allocationJson = mapper.writeValueAsString(preferences.allocation());
             entity.categoryBudgets = mapper.writeValueAsString(preferences.categoryBudgets());
+            entity.planJson = mapper.writeValueAsString(preferences.plan());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -47,6 +50,7 @@ public class UserPreferencesRepositoryImpl implements UserPreferencesRepository 
     }
 
     @Override
+    @Transactional
     public Optional<UserPreferences> get() {
 
         UserPreferencesEntity entity = UserPreferencesEntity.findAll().firstResult();
@@ -56,21 +60,14 @@ public class UserPreferencesRepositoryImpl implements UserPreferencesRepository 
         }
 
         try {
-            Map<String, Double> allocation = mapper.readValue(
-                    entity.allocationJson,
-
+            Map<String, Double> allocation = mapper.readValue(entity.allocationJson,
                     new TypeReference<Map<String, Double>>() {
-                    }
+                    });
 
-            );
+            Map<String, MonthlyBudget> budgets = new HashMap<>();
+            FinancialPlan plan = null;
 
-            Map<String, MonthlyBudget> budgets =
-
-                    new HashMap<>();
-
-            if (entity.categoryBudgets != null
-                    &&
-                    !entity.categoryBudgets.isBlank()) {
+            if (entity.categoryBudgets != null && !entity.categoryBudgets.isBlank()) {
 
                 budgets = mapper.readValue(entity.categoryBudgets, new TypeReference<Map<String, MonthlyBudget>>() {
                 });
@@ -81,6 +78,18 @@ public class UserPreferencesRepositoryImpl implements UserPreferencesRepository 
 
                 entity.persist();
             }
+            if (entity.planJson != null && !entity.planJson.isBlank()) {
+
+                plan = mapper.readValue(entity.planJson, FinancialPlan.class);
+
+            }
+            if (plan == null) {
+
+                plan = PlanAdapter.legacyDefault();
+                entity.planJson = mapper.writeValueAsString(plan);
+                entity.persistAndFlush();
+            
+            }
 
             return Optional.of(
                     new UserPreferences(
@@ -88,6 +97,7 @@ public class UserPreferencesRepositoryImpl implements UserPreferencesRepository 
                             entity.monthlyIncome,
                             allocation,
                             budgets,
+                            PlanAdapter.resolve(plan),
                             entity.fireEnabled,
                             entity.fireTargetCorpus));
         } catch (Exception e) {

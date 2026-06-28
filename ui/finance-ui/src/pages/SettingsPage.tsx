@@ -1,70 +1,33 @@
 import { useState } from "react";
+
 import type { Preferences } from "../types";
+
+import PlanView from "../components/plan/PlanView";
+
+import { validatePlan } from "../utils/planValidation";
 
 export default function SettingsPage({
   preferences,
+
   onUpdated,
 }: {
   preferences: Preferences;
+
   onUpdated: (prefs: Preferences) => void;
 }) {
   const [form, setForm] = useState(preferences);
 
-  const totalAllocation = Object.values(form.allocation).reduce(
-    (sum, val) => sum + val,
-    0
-  );
-
-  const formatLabel = (value: string) =>
-    value
-      .toLowerCase()
-      .split("_")
-      .map(
-        word => word.charAt(0).toUpperCase() + word.slice(1)
-      )
-      .join(" ");
-
-  const totalBudgetAllocation = Object.values(form.categoryBudgets ?? {})
-    .filter(b => b.enabled)
-    .reduce((sum, b) => sum + b.percentage, 0);
-
-  const budgetValid = totalBudgetAllocation >= 99.9 && totalBudgetAllocation <= 100.1;
-
-  const isValid = totalAllocation >= 99.9 && totalAllocation <= 100.1;
-
-
-  const updateAllocation = (key: string, value: number) => {
-    setForm({
-      ...form,
-      allocation: {
-        ...form.allocation,
-        [key]: value,
-      },
-    });
-  };
-
-  const updateBudget = (key: string, field: "percentage" | "enabled", value: number | boolean) => {
-    setForm({
-      ...form,
-      categoryBudgets: {
-        ...form.categoryBudgets,
-        [key]: {
-          ...form.categoryBudgets[key],
-          [field]: value
-        }
-      }
-    });
-  };
+  const validation = validatePlan(form.plan);
 
   const save = async () => {
-    if (!isValid || !budgetValid) {
-      alert("Allocation must total exactly 100%");
+    if (!validation.valid) {
       return;
     }
-
     await fetch("http://localhost:8080/api/v1/preferences", {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify(form),
     });
 
@@ -72,156 +35,113 @@ export default function SettingsPage({
     alert("Preferences updated");
   };
 
-
   return (
-    <div style={{ padding: 20, width: "90%" }}>
+    <div
+      style={{
+        maxWidth: 1100,
+
+        margin: "0 auto",
+
+        padding: 24,
+      }}
+    >
       <h2>⚙ Settings</h2>
 
-      <h3>Currency</h3>
-      <select
-        value={form.currency}
-        onChange={(e) =>
-          setForm({ ...form, currency: e.target.value })
-        }
-      >
-        <option value="INR">INR ₹</option>
-        <option value="USD">USD $</option>
-        <option value="EUR">EUR €</option>
-      </select>
-
-      <div style={{
-        padding: 20,
-        background: "#fff",
-        borderRadius: 12,
-        marginBottom: 24,
-        marginTop: 24,
-        boxShadow: "0 4px 12px rgba(0,0,0,0.05)"
-      }}>
-        <h3 style={{ marginTop: 20 }}>Allocation (%)</h3>
-
-        {Object.entries(form.allocation).map(([key, value]) => (
-          <div key={key} style={{ display: "grid", gridTemplateColumns: "220px 120px", gap: 12, alignItems: "center", marginBottom: 10 }}>
-            <label> {formatLabel(key)} </label>
-
-            <input   style={{ width: "90px"}} type="number" value={value} onChange={(e) => updateAllocation(key, Number(e.target.value))} />
-
-          </div>
-
-        ))}
-
-
-
-
-      </div>
       <div
         style={{
-          marginTop: 10,
-          padding: 10,
-          borderRadius: 6,
-          backgroundColor: isValid ? "#ecfdf5" : "#fef2f2",
-          border: `1px solid ${isValid ? "#10b981" : "#ef4444"}`,
+          background: "#ffffff",
+
+          border: "1px solid #E2E8F0",
+
+          borderRadius: 16,
+
+          padding: 24,
+
+          marginBottom: 24,
         }}
       >
-        <strong>Allocation Total: {totalAllocation.toFixed(1)}%</strong>
+        <h3>Currency</h3>
 
-        {!isValid && (
-          <div style={{ color: "#b91c1c", marginTop: 5 }}>
-            Allocation must total exactly 100%
-          </div>
-        )}
+        <select
+          value={form.currency}
+          onChange={(e) =>
+            setForm({
+              ...form,
+
+              currency: e.target.value,
+            })
+          }
+          style={{
+            padding: 10,
+
+            borderRadius: 8,
+
+            border: "1px solid #CBD5E1",
+          }}
+        >
+          <option value="INR">INR ₹</option>
+
+          <option value="USD">USD $</option>
+
+          <option value="EUR">EUR €</option>
+        </select>
       </div>
 
-      <div style={{
-        padding: 20,
-        background: "#fff",
-        borderRadius: 12,
-        marginBottom: 24,
-        marginTop: 24,
-        boxShadow: "0 4px 12px rgba(0,0,0,0.05)"
-      }}>
-        {/* Category Budgets*/}
-        <h3 style={{ marginTop: 20 }}>
-          Category Budgets (%)
-        </h3>
-
-        {Object.entries(
-          form.categoryBudgets
-        ).map(([key, budget]) => (
-
-          <div
-            key={key}
-            style={{
-              display: "grid",
-              gridTemplateColumns: "220px 100px auto",
-              gap: 12,
-              alignItems: "center",
-              marginBottom: 10
-            }}
-          >
-
-            <div style={{ width: 180 }}>
-              {key}
-            </div>
-
-            <input
-              type="number"
-              value={budget.percentage}
-              onChange={(e) =>
-                updateBudget(
-                  key,
-                  "percentage",
-                  Number(e.target.value)
-                )
-              }
-            />
-            <label>
-              <input
-                type="checkbox"
-                checked={budget.enabled}
-                onChange={(e) =>
-                  updateBudget(
-                    key,
-                    "enabled",
-                    e.target.checked
-                  )
-                }
-              />
-              Enabled
-            </label>
-          </div>
-        ))}
-      </div>
       <div
         style={{
-          marginTop: 10,
-          padding: 10,
-          borderRadius: 6,
-          background:
-            budgetValid ? "#ecfdf5" : "#fef2f2",
-          border: `1px solid ${budgetValid ? "#10b981" : "#ef4444"}`
+          background: "#ffffff",
+
+          border: "1px solid #E2E8F0",
+
+          borderRadius: 16,
+
+          padding: 24,
+
+          marginBottom: 24,
         }}
       >
-        <strong>
-          Category Total: {totalBudgetAllocation.toFixed(1)}% </strong>
-        {
-          !budgetValid && (
-            <div style={{ color: "#b91c1c" }} >
-              Category budgets
-              must total 100%
-            </div>
-          )
-        }
+        <PlanView
+          plan={form.plan}
+          onChange={(plan) =>
+            setForm({
+              ...form,
+
+              plan,
+            })
+          }
+        />
       </div>
-      {/* Fire settings */}
-      <div style={{
-        padding: 20,
-        background: "#fff",
-        borderRadius: 12,
-        marginBottom: 24,
-        marginTop: 24,
-        boxShadow: "0 4px 12px rgba(0,0,0,0.05)"
-      }}>
-        <h3 style={{ marginTop: 20 }}>FIRE Settings</h3>
+      {!validation.valid && (
+        <div
+          style={{
+            marginTop: 20,
+            padding: 16,
+            background: "#FEF2F2",
+            border: "1px solid #FCA5A5",
+            borderRadius: 12,
+          }}
+        >
+          <h4>Validation Issues</h4>
+          <ul>
+            {validation.errors.map((error) => (
+              <li key={error}>{error}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      <div
+        style={{
+          background: "#ffffff",
+
+          border: "1px solid #E2E8F0",
+
+          borderRadius: 16,
+
+          padding: 24,
+        }}
+      >
+        <h3>FIRE Settings</h3>
 
         <label>
           <input
@@ -230,22 +150,20 @@ export default function SettingsPage({
             onChange={() =>
               setForm({
                 ...form,
+
                 fireEnabled: !form.fireEnabled,
               })
             }
-          />
+          />{" "}
           Enable FIRE
         </label>
 
         {form.fireEnabled && (
-          <div style={{
-            padding: 20,
-            background: "#fff",
-            borderRadius: 12,
-            marginBottom: 16,
-            marginTop: 16,
-            boxShadow: "0 4px 12px rgba(0,0,0,0.05)"
-          }}>
+          <div
+            style={{
+              marginTop: 16,
+            }}
+          >
             <input
               type="number"
               placeholder="Target Corpus"
@@ -253,15 +171,46 @@ export default function SettingsPage({
               onChange={(e) =>
                 setForm({
                   ...form,
+
                   fireTargetCorpus: Number(e.target.value),
                 })
               }
+              style={{
+                padding: 10,
+
+                borderRadius: 8,
+
+                border: "1px solid #CBD5E1",
+              }}
             />
           </div>
         )}
       </div>
-      <div style={{ marginTop: 20, opacity: isValid && budgetValid ? 1 : 0.5, cursor: isValid && budgetValid ? "pointer" : "not-allowed" }}>
-        <button onClick={save} disabled={!isValid || !budgetValid}>Save Changes</button>
+
+      <div
+        style={{
+          marginTop: 24,
+
+          display: "flex",
+
+          justifyContent: "flex-end",
+        }}
+      >
+        <button
+          onClick={save}
+          disabled={!validation.valid}
+          style={{
+            background: validation.valid ? "#2563EB" : "#94A3B8",
+            color: "#fff",
+            padding: "12px 24px",
+            border: "none",
+            borderRadius: 8,
+            cursor: validation.valid ? "pointer" : "not-allowed",
+            opacity: validation.valid ? 1 : 0.6,
+          }}
+        >
+          Save Changes
+        </button>
       </div>
     </div>
   );

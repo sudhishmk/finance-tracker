@@ -2,6 +2,7 @@ package com.sudhi.financetracker.app.rest;
 
 import java.util.List;
 
+import com.sudhi.financetracker.app.service.BudgetFacade;
 import com.sudhi.financetracker.app.service.BudgetService;
 import com.sudhi.financetracker.budget.model.BudgetStatusResponse;
 import com.sudhi.financetracker.finance.model.Expense;
@@ -25,32 +26,32 @@ public class BudgetResource {
 
     private final IncomeRepository incomeRepository;
 
-    private final IncomeService incomeService =  new IncomeService();
+    private final IncomeService incomeService = new IncomeService();
 
-    private final BudgetService budgetService = new BudgetService();
+    private final BudgetFacade budgetFacade = new BudgetFacade();
 
-    public BudgetResource(ExpenseRepository expenseRepository,UserPreferencesRepository preferencesRepository,
-        IncomeRepository incomeRepository) {
+    public BudgetResource(ExpenseRepository expenseRepository, UserPreferencesRepository preferencesRepository,
+            IncomeRepository incomeRepository) {
 
         this.expenseRepository = expenseRepository;
         this.preferencesRepository = preferencesRepository;
-        this.incomeRepository =     incomeRepository;
+        this.incomeRepository = incomeRepository;
 
     }
 
     @GET
     @Path("/status")
-    public BudgetStatusResponse status( @QueryParam("month") String month ) {
+    public BudgetStatusResponse status(@QueryParam("month") String month) {
 
         UserPreferences preferences = preferencesRepository.get().orElseThrow();
 
-        List<Expense> expenses = expenseRepository.findByMonth( month);
+        List<Expense> expenses = expenseRepository.findByMonth(month);
 
         List<Income> incomes = incomeRepository.findByMonth(month);
 
         double monthlyIncome = incomeService.totalMonthlyIncome(incomes);
 
-        return budgetService.calculate(preferences,expenses,monthlyIncome);
+        return budgetFacade.calculate(preferences, monthlyIncome, expenses);
 
     }
 

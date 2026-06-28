@@ -104,14 +104,14 @@ public final class PlanDefaults {
                         "HEALTH",
                         "Health",
                         "NORMAL",
-                        10,
+                        35,
                         true),
 
                 new BudgetCategory(
                         "TRAVEL",
                         "Travel",
                         "FUN",
-                        60,
+                        100,
                         true),
 
                 new BudgetCategory(

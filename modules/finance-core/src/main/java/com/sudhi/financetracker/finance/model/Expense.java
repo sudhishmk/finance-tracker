@@ -4,8 +4,7 @@ import java.time.LocalDate;
 
 public class Expense {
 
-    private Long id;   // ✅ ADD THIS
-
+    private Long id;   
     private LocalDate date;
     private String description;
     private double amount;
@@ -34,7 +33,7 @@ public class Expense {
         this.valueScore = valueScore;
     }
 
-    public Long getId() { return id; }   // ✅ ADD
+    public Long getId() { return id; }   
     public LocalDate getDate() { return date; }
     public String getDescription() { return description; }
     public double getAmount() { return amount; }
