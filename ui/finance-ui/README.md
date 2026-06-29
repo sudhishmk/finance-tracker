@@ -1,73 +1,200 @@
-# React + TypeScript + Vite
+# Finance Tracker
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern personal finance platform built with Java, Quarkus and React.
 
-Currently, two official plugins are available:
+Track expenses, design financial plans, monitor budgets, project FIRE goals and receive AI-powered financial insights.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Features
 
-## React Compiler
+### Expense Tracking
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- Expense management
+- Category based spending
+- Payment mode support
+- Value score analysis
+- Monthly summaries
 
-## Expanding the ESLint configuration
+### Financial Planning
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- Hierarchical Financial Plans
+- Spending allocations
+- Investment allocations
+- Category level budgeting
+- Validation engine
+- Customizable plans
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+### Budget Engine
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+- BudgetEngineV2
+- Allocation snapshots
+- Category snapshots
+- Budget vs Actual tracking
+- Utilization analysis
+- Remaining budget insights
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### FIRE Planning
+
+- FIRE projections
+- Inflation adjustments
+- Corpus calculations
+- Withdrawal simulations
+- Scenario analysis
+- Growth trajectories
+
+### AI Financial Coach
+
+- Monthly review
+- Wins
+- Risks
+- Opportunities
+- Action recommendations
+- Pluggable LLM providers
+
+## Architecture
+
+```text
+React UI
+   ↓
+
+Quarkus API
+   ↓
+
+Finance Core
+Budget Engine
+FIRE Engine
+Analytics Engine
+AI Coach
+   ↓
+
+SQLite
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Modules
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+```text
+modules/
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+finance-core/
+budget-engine/
+fire-engine/
+analytics-engine/
+
+app/
+
+finance-app/
 ```
+
+## Technology Stack
+
+Backend
+
+- Java 21
+- Quarkus
+- Maven
+- SQLite
+
+Frontend
+
+- React
+- Vite
+- TypeScript
+- Recharts
+
+AI
+
+- OpenAI Compatible APIs
+- Granite
+- Extensible Provider Layer
+
+## Running Locally
+
+Linux
+
+```bash
+./scripts/start.sh
+```
+
+Mac
+
+```bash
+./scripts/start-mac.sh
+```
+
+Windows
+
+```powershell
+scripts\start.ps1
+```
+
+## Tests
+
+```bash
+mvn clean test
+```
+
+## Build
+
+Parent
+
+```bash
+mvn clean install
+```
+
+Frontend
+
+```bash
+npm install
+npm run build
+```
+
+Start Application
+
+Backend
+
+```bash
+cd app/finance-app/
+
+./mvnw quarkus:dev
+```
+
+Frontend
+
+```bash
+cd ui/finance-ui/
+npm run dev
+```
+
+Access Application at 
+
+ Local:   http://localhost:5173/
+
+ Backend API available at -: http://localhost:8080/
+
+
+
+## Roadmap
+
+
+### v0.7
+
+FIRE Redesign
+
+Scenario Analysis
+
+Goal Tracking
+
+### v0.8
+
+Forecasting
+
+Trends
+
+Savings Analytics
+
+### v1.0
+
+Open Source Release
+
+## License
+
+MIT License
