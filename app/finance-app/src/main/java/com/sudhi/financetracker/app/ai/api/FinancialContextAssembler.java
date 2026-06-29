@@ -12,7 +12,8 @@ import com.sudhi.financetracker.app.repository.IncomeRepositoryImpl;
 import com.sudhi.financetracker.app.repository.UserPreferencesRepositoryImpl;
 
 import com.sudhi.financetracker.app.service.BudgetService;
-
+import com.sudhi.financetracker.app.service.BudgetServiceV2;
+import com.sudhi.financetracker.finance.domain.budget.BudgetSnapshot;
 import com.sudhi.financetracker.finance.model.Expense;
 import com.sudhi.financetracker.finance.model.Income;
 import com.sudhi.financetracker.finance.model.MonthlySummary;
@@ -36,6 +37,8 @@ public class FinancialContextAssembler {
 
         BudgetService budgetService = new BudgetService();
 
+        BudgetServiceV2 budgetServicev2 = new BudgetServiceV2();
+
         IncomeService incomeService = new IncomeService();
 
         public FinancialSnapshot build(String month) {
@@ -50,7 +53,17 @@ public class FinancialContextAssembler {
                 MonthlySummary summary = summaryService.generate(incomes, expenses);
                 double monthlyIncome = incomeService.totalMonthlyIncome(incomes);
 
-                var budget = budgetService.calculate(preferences, expenses, monthlyIncome);
+                var budget = budgetServicev2.calculate(preferences, monthlyIncome, expenses);
+
+                double totalBudget = budget.categories().stream().mapToDouble(c -> c.budget()).sum();
+
+                double totalSpent = budget.categories().stream().mapToDouble(c -> c.spent()).sum();
+
+                double budgetUtilization = totalBudget == 0 ? 0 : (totalSpent / totalBudget) * 100;
+
+                List<String> insights = budget.categories().stream().filter(c -> c.utilization() > 80)
+                                .map(c -> c.name() + " utilization is " + String.format("%.1f%%", c.utilization()))
+                                .toList();
 
                 return new FinancialSnapshot(
                                 summary.totalIncome(),
@@ -58,9 +71,9 @@ public class FinancialContextAssembler {
                                 summary.savings(),
                                 summary.savingsRate(),
                                 summary.topSpendingCategory(),
-                                budget.utilization(),
+                                budgetUtilization,
                                 preferences.fireTargetCorpus(),
-                                List.of()
+                                insights
 
                 );
 
